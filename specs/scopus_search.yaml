@@ -1,0 +1,87 @@
+openapi: 3.0.0
+info:
+  contact:
+    name: Sam Nolan
+  description: Searches the scopus API
+  title: Scopus Search API
+  version: v1
+servers:
+- description: Production
+  url: https://api.elsevier.com/content/search/scopus
+paths:
+  /:
+    get:
+      description: Searches Scopus for papers
+      operationId: search 
+      parameters:
+      - description: Accepts Header
+        in: header
+        name: Accept
+        schema:
+          type: string
+          enum: ["application/json", "application/atom+xml", "application/xml"]
+          default: "application/json"
+      - description: Authorization header
+        in: header
+        name: Authorization
+        schema:
+          type: string
+      - description: X-ELS-APIKey
+        in: header
+        required: true
+        schema:
+          type: string
+      # Now for query paramaters
+      - description: Query
+        name: query
+        in: query
+        schema:
+          type: string
+      - description: Fields to be returned
+        name: field
+        in: query
+        schema: 
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+          description: OK
+components:
+  schemas:
+    SearchResponse:
+      description: The details of the paper
+      type: object
+      properties:
+        search-results:
+          type: array
+          items: 
+            $ref: '#/components/schemas/SearchResults'
+    SearchResults: 
+      description: Search Results
+      type: object
+      properties:
+        "opensearch:totalResults":
+          description: The amount of results to that query
+          type: string
+        "opensearch:itemsPerPage":
+          description: Items per page
+          type: string
+        entry:
+          type: array
+          items:
+            $ref: '#/compononts/schemas/SearchResult'
+    SearchResult:
+      description: Search Result
+      type: object
+      properties:
+        "prism:url":
+          type: string
+        "dc:identifier":
+          type: string
+        "dc:title":
+          type: string
+        "dc:doi":
+          type: string
